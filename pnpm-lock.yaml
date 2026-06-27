@@ -41,6 +41,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.168.7(@tanstack/react-router@1.170.16(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@8.0.13(@types/node@22.19.19)(jiti@2.7.0))
+      best-effort-json-parser:
+        specifier: ^1.5.1
+        version: 1.5.1
       chart.js:
         specifier: ^4.5.1
         version: 4.5.1
@@ -1891,6 +1894,9 @@ packages:
     resolution: {integrity: sha512-MujYO3eP72uvmSE0i4wltsodRfIpZATP3jvzRNRGGxgzId7aVocVJJV3nf01qnzzKFGxQVC9bpWxl5cjxTr/7Q==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  best-effort-json-parser@1.5.1:
+    resolution: {integrity: sha512-Snlb3OTA7lnOW1vZyPByO/cWl3wDElisGId4BIEhmPGOWJaEyGpXoRgaIFXDIRh59NmIiuTY2p0YPq89sfwjWw==}
 
   bidi-js@1.0.3:
     resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
@@ -4512,6 +4518,8 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.10.31: {}
+
+  best-effort-json-parser@1.5.1: {}
 
   bidi-js@1.0.3:
     dependencies:

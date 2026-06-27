@@ -9,4 +9,3 @@ const PROVIDERS = {
 };
 
 export const AiClient = PROVIDERS[AI_PROVIDER]();
-console.log({ AiClient });

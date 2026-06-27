@@ -1,5 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useState } from "react";
+import { CATEGORIES_COLORS } from "#/common/lib/youtube/constants";
+import type { Channel } from "#/common/lib/youtube/types";
 import {
 	Select,
 	SelectContent,
@@ -7,8 +9,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/common/ui/Select";
-import type { Channel } from "#/common/lib/youtube/types";
-import { CATEGORIES_COLORS } from "#/common/lib/youtube/constants";
 
 const LIST_LENGTH_OPTIONS = ["7", "15", "30", "60", "100", "all"] as const;
 
@@ -74,7 +74,7 @@ export function TopChannels({ channels }: { channels: Channel[] }) {
 					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 						const c = top[virtualRow.index];
 
-						const barColor = CATEGORIES_COLORS.get(c.categoryId)
+						const barColor = CATEGORIES_COLORS.get(c.categoryId);
 
 						const hours = c.watchedTime / 3600;
 						const pct = Math.max(2, (hours / maxHours) * 100);
@@ -89,7 +89,10 @@ export function TopChannels({ channels }: { channels: Channel[] }) {
 							>
 								<div className="flex items-baseline justify-between gap-3">
 									<span className="truncate text-base font-medium">
-										{String(virtualRow.index + 1).padStart(2, "0")}. {c.name}  <span className="text-muted-foreground">· {c.categoryName}</span>
+										{String(virtualRow.index + 1).padStart(2, "0")}. {c.name}
+										<span className="text-muted-foreground">
+											· {c.categoryName}
+										</span>
 									</span>
 									<span className="font-mono text-sm text-muted-foreground">
 										{hours.toFixed(1)}h

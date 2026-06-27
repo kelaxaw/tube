@@ -1,11 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import type { GeneratedInsights } from "#/common/lib/ai/types";
 import { queryKeys } from "#/common/lib/queryKeys";
-import type { FormattedVideo } from "#/common/lib/youtube/types";
 import { Button } from "#/common/ui/Button";
-import { analyzeHistory } from "#/modules/Upload/api/analyzeHistory";
-import { Loading } from "#/modules/Upload/ui/Loading";
+import type { AnalyzeHistoryResponse } from "#/modules/Upload/types";
 import { copyPng, downloadPng, sharePng } from "../lib/exportCard";
 import {
 	SHARE_CARD_META,
@@ -16,44 +15,29 @@ import {
 
 export function SharePage() {
 	const queryClient = useQueryClient();
-	const uploadedVideos = queryClient.getQueryData<FormattedVideo[]>(
-		queryKeys.history.uploadedVideos(),
+	const analysis = queryClient.getQueryData<AnalyzeHistoryResponse>(
+		queryKeys.history.analysis(),
 	);
-	const analysisQuery = useQuery({
-		queryKey: queryKeys.history.analysis(),
-		queryFn: () => {
-			if (!uploadedVideos) {
-				throw new Error("Upload your YouTube watch history first.");
-			}
-			return analyzeHistory({ data: uploadedVideos });
-		},
-		enabled: Boolean(uploadedVideos),
-		staleTime: Number.POSITIVE_INFINITY,
-	});
+	const insights = queryClient.getQueryData<Partial<GeneratedInsights>>(
+		queryKeys.history.insights(),
+	);
 
 	const [active, setActive] = useState(0);
 	const [busy, setBusy] = useState<null | "download" | "share" | "copy">(null);
 	const [status, setStatus] = useState<string | null>(null);
 	const exportRef = useRef<HTMLDivElement>(null);
 
-	if (analysisQuery.isPending) {
-		return (
-			<div className="flex justify-center items-center h-[calc(100dvh-76px)]">
-				<Loading />
-			</div>
-		);
-	}
+	const insightsReady =
+		insights?.personality !== undefined &&
+		insights.opportunityCost !== undefined;
 
-	const analysis = analysisQuery.data;
-
-	if (analysisQuery.isError || !uploadedVideos || !analysis) {
+	if (!analysis || !insightsReady) {
 		return (
 			<main className="container mx-auto flex min-h-[60vh] items-center justify-center px-5">
 				<div className="flex max-w-md flex-col items-center gap-4 text-center">
 					<h1 className="text-3xl font-semibold">Nothing to share yet</h1>
 					<p className="text-sm text-muted-foreground">
-						{analysisQuery.error?.message ??
-							"Upload your YouTube watch history to generate your wrapped cards."}
+						Upload your YouTube watch history to generate your wrapped cards.
 					</p>
 					<Button asChild size="lg">
 						<Link to="/upload">Upload history</Link>
@@ -62,6 +46,8 @@ export function SharePage() {
 			</main>
 		);
 	}
+
+	const readyInsights = insights as GeneratedInsights;
 
 	const activeCard = SHARE_CARD_META[active];
 
@@ -122,7 +108,11 @@ export function SharePage() {
 								}}
 							>
 								<div className="rail-thumb">
-									<ShareCardPreview kind={c.id} analysis={analysis} />
+									<ShareCardPreview
+										kind={c.id}
+										analysis={analysis}
+										insights={readyInsights}
+									/>
 								</div>
 								<div className="rail-meta">
 									<div className="rail-label">
@@ -136,7 +126,11 @@ export function SharePage() {
 
 					<div className="share-preview">
 						<div className="preview-frame">
-							<ShareCardPreview kind={activeCard.id} analysis={analysis} />
+							<ShareCardPreview
+								kind={activeCard.id}
+								analysis={analysis}
+								insights={readyInsights}
+							/>
 						</div>
 						<div className="preview-actions">
 							<button
@@ -181,7 +175,11 @@ export function SharePage() {
 				className="tube-share export-node"
 				aria-hidden="true"
 			>
-				<ShareCardSurface kind={activeCard.id} analysis={analysis} />
+				<ShareCardSurface
+					kind={activeCard.id}
+					analysis={analysis}
+					insights={readyInsights}
+				/>
 			</div>
 
 			<style>{`

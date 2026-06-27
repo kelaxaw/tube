@@ -2,8 +2,6 @@ import { isUrl } from "#/common/lib/utils.ts";
 import type { FormattedVideo, TakeoutRawResponse } from "./types";
 
 export const mapTakeoutRaw = (data: TakeoutRawResponse): FormattedVideo[] => {
-	console.log({ data });
-
 	return data.map((item) => ({
 		title: item.title,
 		videoId:

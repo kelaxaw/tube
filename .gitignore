@@ -13,4 +13,4 @@ __unconfig*
 output.json
 .claude/settings.local.json
 .vscode
-
+CLAUDE.md

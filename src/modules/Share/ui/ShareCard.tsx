@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { AnalyzeHistoryResponse } from "#/modules/Upload/api/analyzeHistory";
+import type { GeneratedInsights } from "#/common/lib/ai/types";
+import type { AnalyzeHistoryResponse } from "#/modules/Upload/types";
 
 export type ShareCardId = "hours" | "channels" | "personality" | "tradeoff";
 
@@ -10,7 +11,7 @@ export const SHARE_CARD_META: { id: ShareCardId; label: string }[] = [
 	{ id: "tradeoff", label: "what i could have" },
 ];
 
-type CardProps = { analysis: AnalyzeHistoryResponse };
+type CardProps = { analysis: AnalyzeHistoryResponse; insights: GeneratedInsights };
 
 function ShareWatermark() {
 	return (
@@ -99,8 +100,8 @@ const SHARE_CARDS: Record<
 		</div>
 	),
 
-	personality: ({ analysis }) => {
-		const { personality, isFallback } = analysis.insight;
+	personality: ({ insights }) => {
+		const { personality, isFallback } = insights;
 		return (
 			<div className="sc-pers">
 				<div className="sc-eyebrow">my 2025 personality</div>
@@ -133,7 +134,7 @@ const SHARE_CARDS: Record<
 		);
 	},
 
-	tradeoff: ({ analysis }) => (
+	tradeoff: ({ analysis, insights }) => (
 		<div className="sc-trade">
 			<div className="sc-eyebrow">opportunity cost · 2025</div>
 			<div className="sc-trade-h">
@@ -142,7 +143,7 @@ const SHARE_CARDS: Record<
 				<br />i could have...
 			</div>
 			<div className="sc-trade-list">
-				{analysis.insight.opportunityCost.slice(0, 4).map((it, i) => (
+				{insights.opportunityCost.slice(0, 4).map((it, i) => (
 					<div key={it.activity} className="sc-trade-row">
 						<div className="sc-trade-num">{String(i + 1).padStart(2, "0")}</div>
 						<div className="sc-trade-text">{it.activity}</div>
@@ -171,12 +172,14 @@ const SHARE_CARDS: Record<
 export function ShareCardSurface({
 	kind,
 	analysis,
+	insights,
 }: {
 	kind: ShareCardId;
 	analysis: AnalyzeHistoryResponse;
+	insights: GeneratedInsights;
 }) {
 	const Card = SHARE_CARDS[kind] ?? SHARE_CARDS.hours;
-	return <Card analysis={analysis} />;
+	return <Card analysis={analysis} insights={insights} />;
 }
 
 /**
@@ -186,9 +189,11 @@ export function ShareCardSurface({
 export function ShareCardPreview({
 	kind,
 	analysis,
+	insights,
 }: {
 	kind: ShareCardId;
 	analysis: AnalyzeHistoryResponse;
+	insights: GeneratedInsights;
 }) {
 	const wrapRef = useRef<HTMLDivElement>(null);
 	const innerRef = useRef<HTMLDivElement>(null);
@@ -210,7 +215,7 @@ export function ShareCardPreview({
 	return (
 		<div ref={wrapRef} className="share-card-wrap">
 			<div ref={innerRef} className="share-card-inner">
-				<ShareCardSurface kind={kind} analysis={analysis} />
+				<ShareCardSurface kind={kind} analysis={analysis} insights={insights} />
 			</div>
 			<style>{`
         .share-card-wrap { width: 100%; height: 100%; position: relative; overflow: hidden; background: var(--bg-0); }
